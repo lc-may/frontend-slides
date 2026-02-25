@@ -11,40 +11,72 @@ A Claude Code skill for creating stunning, animation-rich HTML presentations —
 - **Zero Dependencies** — Single HTML files with inline CSS/JS. No npm, no build tools, no frameworks.
 - **Visual Style Discovery** — Can't articulate design preferences? No problem. Pick from generated visual previews.
 - **PPT Conversion** — Convert existing PowerPoint files to web, preserving all images and content.
-- **Anti-AI-Slop** — Curated distinctive styles that avoid generic AI aesthetics (bye-bye, purple gradients on white).
+- **Anti-AI-Slop** — 12 curated distinctive styles that avoid generic AI aesthetics.
 - **Production Quality** — Accessible, responsive, well-commented code you can customize.
+- **Viewport Fitting** — Every slide fits exactly in the viewport. No scrolling within slides.
 
 ## Installation
 
 ### For Claude Code Users
 
-Copy the skill files to your Claude Code skills directory:
+Clone or copy this skill to your Claude Code skills directory:
 
 ```bash
 # Create the skill directory
 mkdir -p ~/.claude/skills/frontend-slides
 
-# Copy the files (or download from this repo)
-cp SKILL.md ~/.claude/skills/frontend-slides/
-cp STYLE_PRESETS.md ~/.claude/skills/frontend-slides/
+# Clone directly
+git clone https://github.com/anthropics/frontend-slides.git ~/.claude/skills/frontend-slides
+
+# Or copy files manually
+cp -r ./frontend-slides/* ~/.claude/skills/frontend-slides/
 ```
 
-Then use it by typing `/frontend-slides` in Claude Code.
+The directory structure should be:
 
-### Manual Download
+```
+~/.claude/skills/frontend-slides/
+├── SKILL.md                      # Main skill instructions
+├── reference/
+│   ├── style-presets.md          # 12 visual style definitions
+│   ├── html-template.md          # HTML structure patterns
+│   ├── viewport-fitting.md       # Viewport CSS requirements
+│   └── animation-patterns.md     # Animation code patterns
+└── scripts/
+    ├── slide-controller.js       # JavaScript navigation controller
+    └── pptx-extract.py           # PowerPoint extraction script
+```
 
-1. Download `SKILL.md` and `STYLE_PRESETS.md` from this repo
-2. Place them in `~/.claude/skills/frontend-slides/`
-3. Restart Claude Code
+### Requirements
+
+- **Claude Code CLI** — [Get it here](https://claude.ai/claude-code)
+- **Python 3** with `python-pptx` — For PowerPoint conversion (optional)
+  ```bash
+  pip install python-pptx
+  ```
 
 ## Usage
+
+### Basic Usage
+
+In Claude Code, type:
+
+```
+/frontend-slides
+```
+
+Then describe what you want:
+
+```
+> "I want to create a pitch deck for my AI startup"
+```
 
 ### Create a New Presentation
 
 ```
 /frontend-slides
 
-> "I want to create a pitch deck for my AI startup"
+> "Create a 10-slide presentation about OpenClaw, the open-source AI agent platform"
 ```
 
 The skill will:
@@ -68,33 +100,63 @@ The skill will:
 3. Let you pick a visual style
 4. Generate an HTML presentation with all your original assets
 
-## Included Styles
+### Direct Style Selection
+
+If you already know which style you want:
+
+```
+/frontend-slides
+
+> "Create a 5-slide intro to my product using Paper & Ink style"
+```
+
+Available presets can be specified by name — skip the style discovery phase entirely.
+
+## Available Styles
 
 ### Dark Themes
-- **Neon Cyber** — Futuristic, techy, particle effects
-- **Midnight Executive** — Premium, corporate, trustworthy
-- **Deep Space** — Cinematic, inspiring, vast
-- **Terminal Green** — Developer-focused, hacker aesthetic
+
+| Style | Vibe | Best For |
+|-------|------|----------|
+| **Bold Signal** | Confident, high-impact | Pitch decks, keynotes |
+| **Electric Studio** | Clean, professional | Agency presentations |
+| **Creative Voltage** | Energetic, retro-modern | Creative pitches |
+| **Dark Botanical** | Elegant, sophisticated | Premium brands |
+| **Neon Cyber** | Futuristic, techy | Tech startups |
+| **Terminal Green** | Developer-focused | Dev tools, APIs |
 
 ### Light Themes
-- **Paper & Ink** — Editorial, literary, refined
-- **Swiss Modern** — Clean, Bauhaus-inspired, geometric
-- **Soft Pastel** — Friendly, playful, creative
-- **Warm Editorial** — Magazine-style, photographic
 
-### Specialty
-- **Brutalist** — Raw, bold, attention-grabbing
-- **Gradient Wave** — Modern SaaS aesthetic
+| Style | Vibe | Best For |
+|-------|------|----------|
+| **Notebook Tabs** | Editorial, organized | Reports, reviews |
+| **Pastel Geometry** | Friendly, approachable | Product overviews |
+| **Split Pastel** | Playful, modern | Creative agencies |
+| **Vintage Editorial** | Witty, personality-driven | Personal brands |
+| **Swiss Modern** | Minimal, precise | Corporate, data |
+| **Paper & Ink** | Literary, thoughtful | Storytelling |
 
-## Output Example
+## Output Format
 
-Each presentation is a single, self-contained HTML file:
+Each presentation is a **single, self-contained HTML file**:
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <!-- Fonts, CSS variables, all styles inline -->
+    <style>
+        :root {
+            --bg-primary: #faf9f7;
+            --accent-crimson: #c41e3a;
+            /* ... */
+        }
+        .slide {
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* ... -->
+    </style>
 </head>
 <body>
     <section class="slide title-slide">
@@ -113,15 +175,45 @@ Each presentation is a single, self-contained HTML file:
 </html>
 ```
 
-Features included:
-- Keyboard navigation (arrows, space)
-- Touch/swipe support
-- Mouse wheel scrolling
-- Progress bar
-- Navigation dots
-- Scroll-triggered animations
-- Responsive design
-- Reduced motion support
+### Built-in Features
+
+- **Keyboard navigation** — Arrows (← →), Space, Page Up/Down, Home/End
+- **Touch/swipe support** — Works on mobile and tablets
+- **Mouse wheel scrolling** — Smooth navigation
+- **Progress bar** — Visual indicator at the top
+- **Navigation dots** — Click to jump to any slide
+- **Scroll-triggered animations** — Elements animate as they enter view
+- **Responsive design** — Adapts to all screen sizes
+- **Reduced motion support** — Respects user preferences
+
+### Output Options
+
+You can request output in multiple formats:
+
+```
+> "Create slides about X, output both HTML and PPTX"
+> "Convert this to HTML presentation"
+> "Generate a PowerPoint from this outline"
+```
+
+## File Structure
+
+```
+frontend-slides/
+├── SKILL.md                      # Main skill definition
+├── README.md                     # This file
+├── LICENSE                       # MIT License
+│
+├── reference/
+│   ├── style-presets.md          # 12 curated visual styles
+│   ├── html-template.md          # HTML structure patterns
+│   ├── viewport-fitting.md       # Viewport CSS requirements
+│   └── animation-patterns.md     # Animation code patterns
+│
+└── scripts/
+    ├── slide-controller.js       # JavaScript navigation controller
+    └── pptx-extract.py           # PowerPoint extraction script
+```
 
 ## Philosophy
 
@@ -135,17 +227,58 @@ This skill was born from the belief that:
 
 4. **Comments are kindness.** Code should explain itself to future-you (or anyone else who opens it).
 
-## Files
+5. **Viewport fitting is non-negotiable.** Every slide must fit exactly in the viewport — no scrolling within slides, ever.
 
-| File | Purpose |
-|------|---------|
-| `SKILL.md` | Main skill instructions for Claude Code |
-| `STYLE_PRESETS.md` | Reference file with 10 curated visual styles |
+## Customization
 
-## Requirements
+### Colors
 
-- [Claude Code](https://claude.ai/claude-code) CLI
-- For PPT conversion: Python with `python-pptx` library
+Look for the `:root` CSS variables at the top of the HTML file:
+
+```css
+:root {
+    --bg-primary: #faf9f7;
+    --text-primary: #1a1a1a;
+    --accent-crimson: #c41e3a;
+}
+```
+
+### Fonts
+
+Change the Google Fonts link in the `<head>`:
+
+```html
+<link href="https://fonts.googleapis.com/css2?family=YourFont..." rel="stylesheet">
+```
+
+Then update the CSS variables:
+
+```css
+:root {
+    --font-display: 'Your Display Font', serif;
+    --font-body: 'Your Body Font', sans-serif;
+}
+```
+
+### Animations
+
+Modify the `.reveal` class timings:
+
+```css
+.reveal {
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+```
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Fonts not loading | Check Google Fonts URL, ensure font names match in CSS |
+| Animations not triggering | Verify Intersection Observer is running, check `.visible` class |
+| Scroll snap not working | Ensure `scroll-snap-type` on html/body, each slide needs `scroll-snap-align: start` |
+| Mobile issues | Disable heavy effects at 768px breakpoint, test touch events |
+| Content overflowing | See `reference/viewport-fitting.md` for complete troubleshooting |
 
 ## Credits
 
@@ -156,3 +289,60 @@ Inspired by the "Vibe Coding" philosophy — building beautiful things without b
 ## License
 
 MIT — Use it, modify it, share it.
+
+---
+
+## Font Licenses
+
+All fonts used in this skill are **free for commercial use**. No attribution required.
+
+### SIL Open Font License 1.1 (OFL)
+
+**Source:** [Google Fonts](https://fonts.google.com), [JetBrains](https://www.jetbrains.com/lp/mono/)
+
+| Font | Used In |
+|------|---------|
+| Archivo Black | Bold Signal |
+| Space Grotesk | Bold Signal |
+| Manrope | Electric Studio |
+| Syne | Creative Voltage |
+| Space Mono | Creative Voltage |
+| Cormorant / Cormorant Garamond | Dark Botanical, Paper & Ink |
+| IBM Plex Sans | Dark Botanical |
+| Bodoni Moda | Notebook Tabs |
+| DM Sans | Notebook Tabs |
+| Plus Jakarta Sans | Pastel Geometry |
+| Outfit | Split Pastel |
+| Fraunces | Vintage Editorial |
+| Work Sans | Vintage Editorial |
+| Archivo | Swiss Modern |
+| Nunito | Swiss Modern |
+| Source Serif 4 | Paper & Ink |
+| JetBrains Mono | Terminal Green |
+
+**OFL permits:**
+- ✅ Personal use
+- ✅ Commercial use
+- ✅ Embedding in software/apps
+- ✅ Modification and redistribution
+
+**OFL prohibits:**
+- ❌ Selling font files alone
+
+Reference: [scripts.sil.org/OFL](https://scripts.sil.org/OFL)
+
+### Fontshare License
+
+**Source:** [Fontshare](https://www.fontshare.com)
+
+| Font | Used In |
+|------|---------|
+| Clash Display | Neon Cyber |
+| Satoshi | Neon Cyber |
+
+**Fontshare License permits:**
+- ✅ Personal use
+- ✅ Commercial use
+- ✅ Any media (print, web, mobile, apps, ePub, broadcast, OEM)
+
+Reference: [fontshare.com](https://www.fontshare.com)

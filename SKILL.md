@@ -19,19 +19,15 @@ Create zero-dependency, animation-rich HTML presentations that run entirely in t
 
 ## CRITICAL: Viewport Fitting Requirements
 
-**This section is mandatory for ALL presentations. Every slide must be fully visible without scrolling on any screen size.**
+**Each slide must fit exactly in the viewport. No scrolling within slides, ever.**
 
-### The Golden Rule
+### Quick Rules
 
-```
-Each slide = exactly one viewport height (100vh/100dvh)
-Content overflows? → Split into multiple slides or reduce content
-Never scroll within a slide.
-```
+- Each slide = 100vh/100dvh with `overflow: hidden`
+- All sizes use `clamp()` for responsive scaling
+- Respect content density limits (max 4-6 bullets, max 6 cards)
 
 ### Content Density Limits
-
-To guarantee viewport fitting, enforce these limits per slide:
 
 | Slide Type | Maximum Content |
 |------------|-----------------|
@@ -44,204 +40,7 @@ To guarantee viewport fitting, enforce these limits per slide:
 
 **If content exceeds these limits → Split into multiple slides**
 
-### Required CSS Architecture
-
-Every presentation MUST include this base CSS for viewport fitting:
-
-```css
-/* ===========================================
-   VIEWPORT FITTING: MANDATORY BASE STYLES
-   These styles MUST be included in every presentation.
-   They ensure slides fit exactly in the viewport.
-   =========================================== */
-
-/* 1. Lock html/body to viewport */
-html, body {
-    height: 100%;
-    overflow-x: hidden;
-}
-
-html {
-    scroll-snap-type: y mandatory;
-    scroll-behavior: smooth;
-}
-
-/* 2. Each slide = exact viewport height */
-.slide {
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile browsers */
-    overflow: hidden; /* CRITICAL: Prevent ANY overflow */
-    scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-}
-
-/* 3. Content container with flex for centering */
-.slide-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    max-height: 100%;
-    overflow: hidden; /* Double-protection against overflow */
-    padding: var(--slide-padding);
-}
-
-/* 4. ALL typography uses clamp() for responsive scaling */
-:root {
-    /* Titles scale from mobile to desktop */
-    --title-size: clamp(1.5rem, 5vw, 4rem);
-    --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
-    --h3-size: clamp(1rem, 2.5vw, 1.75rem);
-
-    /* Body text */
-    --body-size: clamp(0.75rem, 1.5vw, 1.125rem);
-    --small-size: clamp(0.65rem, 1vw, 0.875rem);
-
-    /* Spacing scales with viewport */
-    --slide-padding: clamp(1rem, 4vw, 4rem);
-    --content-gap: clamp(0.5rem, 2vw, 2rem);
-    --element-gap: clamp(0.25rem, 1vw, 1rem);
-}
-
-/* 5. Cards/containers use viewport-relative max sizes */
-.card, .container, .content-box {
-    max-width: min(90vw, 1000px);
-    max-height: min(80vh, 700px);
-}
-
-/* 6. Lists auto-scale with viewport */
-.feature-list, .bullet-list {
-    gap: clamp(0.4rem, 1vh, 1rem);
-}
-
-.feature-list li, .bullet-list li {
-    font-size: var(--body-size);
-    line-height: 1.4;
-}
-
-/* 7. Grids adapt to available space */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
-    gap: clamp(0.5rem, 1.5vw, 1rem);
-}
-
-/* 8. Images constrained to viewport */
-img, .image-container {
-    max-width: 100%;
-    max-height: min(50vh, 400px);
-    object-fit: contain;
-}
-
-/* ===========================================
-   RESPONSIVE BREAKPOINTS
-   Aggressive scaling for smaller viewports
-   =========================================== */
-
-/* Short viewports (< 700px height) */
-@media (max-height: 700px) {
-    :root {
-        --slide-padding: clamp(0.75rem, 3vw, 2rem);
-        --content-gap: clamp(0.4rem, 1.5vw, 1rem);
-        --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
-        --h2-size: clamp(1rem, 3vw, 1.75rem);
-    }
-}
-
-/* Very short viewports (< 600px height) */
-@media (max-height: 600px) {
-    :root {
-        --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
-        --content-gap: clamp(0.3rem, 1vw, 0.75rem);
-        --title-size: clamp(1.1rem, 4vw, 2rem);
-        --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
-    }
-
-    /* Hide non-essential elements */
-    .nav-dots, .keyboard-hint, .decorative {
-        display: none;
-    }
-}
-
-/* Extremely short (landscape phones, < 500px height) */
-@media (max-height: 500px) {
-    :root {
-        --slide-padding: clamp(0.4rem, 2vw, 1rem);
-        --title-size: clamp(1rem, 3.5vw, 1.5rem);
-        --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
-        --body-size: clamp(0.65rem, 1vw, 0.85rem);
-    }
-}
-
-/* Narrow viewports (< 600px width) */
-@media (max-width: 600px) {
-    :root {
-        --title-size: clamp(1.25rem, 7vw, 2.5rem);
-    }
-
-    /* Stack grids vertically */
-    .grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ===========================================
-   REDUCED MOTION
-   Respect user preferences
-   =========================================== */
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.2s !important;
-    }
-
-    html {
-        scroll-behavior: auto;
-    }
-}
-```
-
-### Overflow Prevention Checklist
-
-Before generating any presentation, mentally verify:
-
-1. ✅ Every `.slide` has `height: 100vh; height: 100dvh; overflow: hidden;`
-2. ✅ All font sizes use `clamp(min, preferred, max)`
-3. ✅ All spacing uses `clamp()` or viewport units
-4. ✅ Content containers have `max-height` constraints
-5. ✅ Images have `max-height: min(50vh, 400px)` or similar
-6. ✅ Grids use `auto-fit` with `minmax()` for responsive columns
-7. ✅ Breakpoints exist for heights: 700px, 600px, 500px
-8. ✅ No fixed pixel heights on content elements
-9. ✅ Content per slide respects density limits
-
-### When Content Doesn't Fit
-
-If you find yourself with too much content:
-
-**DO:**
-- Split into multiple slides
-- Reduce bullet points (max 5-6 per slide)
-- Shorten text (aim for 1-2 lines per bullet)
-- Use smaller code snippets
-- Create a "continued" slide
-
-**DON'T:**
-- Reduce font size below readable limits
-- Remove padding/spacing entirely
-- Allow any scrolling
-- Cram content to fit
-
-### Testing Viewport Fit
-
-After generating, recommend the user test at these sizes:
-- Desktop: 1920×1080, 1440×900, 1280×720
-- Tablet: 1024×768, 768×1024 (portrait)
-- Mobile: 375×667, 414×896
-- Landscape phone: 667×375, 896×414
+**→ For complete CSS and implementation details, read `reference/viewport-fitting.md`**
 
 ---
 
@@ -303,6 +102,8 @@ If user has content, ask them to share it (text, bullet points, images, etc.).
 **CRITICAL: This is the "show, don't tell" phase.**
 
 Most people can't articulate design preferences in words. Instead of asking "do you want minimalist or bold?", we generate mini-previews and let them react.
+
+**→ For complete style definitions (colors, fonts, signature elements), read `reference/style-presets.md`**
 
 ### How Users Choose Presets
 
@@ -477,194 +278,11 @@ For projects with multiple presentations:
 
 ### HTML Architecture
 
-Follow this structure for all presentations:
+**When generating presentations, read these reference files:**
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presentation Title</title>
-
-    <!-- Fonts (use Fontshare or Google Fonts) -->
-    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=...">
-
-    <style>
-        /* ===========================================
-           CSS CUSTOM PROPERTIES (THEME)
-           Easy to modify: change these to change the whole look
-           =========================================== */
-        :root {
-            /* Colors */
-            --bg-primary: #0a0f1c;
-            --bg-secondary: #111827;
-            --text-primary: #ffffff;
-            --text-secondary: #9ca3af;
-            --accent: #00ffcc;
-            --accent-glow: rgba(0, 255, 204, 0.3);
-
-            /* Typography - MUST use clamp() for responsive scaling */
-            --font-display: 'Clash Display', sans-serif;
-            --font-body: 'Satoshi', sans-serif;
-            --title-size: clamp(2rem, 6vw, 5rem);
-            --subtitle-size: clamp(0.875rem, 2vw, 1.25rem);
-            --body-size: clamp(0.75rem, 1.2vw, 1rem);
-
-            /* Spacing - MUST use clamp() for responsive scaling */
-            --slide-padding: clamp(1.5rem, 4vw, 4rem);
-            --content-gap: clamp(1rem, 2vw, 2rem);
-
-            /* Animation */
-            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-            --duration-normal: 0.6s;
-        }
-
-        /* ===========================================
-           BASE STYLES
-           =========================================== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-            scroll-snap-type: y mandatory;
-            height: 100%;
-        }
-
-        body {
-            font-family: var(--font-body);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            overflow-x: hidden;
-            height: 100%;
-        }
-
-        /* ===========================================
-           SLIDE CONTAINER
-           CRITICAL: Each slide MUST fit exactly in viewport
-           - Use height: 100vh (NOT min-height)
-           - Use overflow: hidden to prevent scroll
-           - Content must scale with clamp() values
-           =========================================== */
-        .slide {
-            width: 100vw;
-            height: 100vh; /* EXACT viewport height - no scrolling */
-            height: 100dvh; /* Dynamic viewport height for mobile */
-            padding: var(--slide-padding);
-            scroll-snap-align: start;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
-            overflow: hidden; /* Prevent any content overflow */
-        }
-
-        /* Content wrapper that prevents overflow */
-        .slide-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            max-height: 100%;
-            overflow: hidden;
-        }
-
-        /* ===========================================
-           RESPONSIVE BREAKPOINTS
-           Adjust content for different screen sizes
-           =========================================== */
-        @media (max-height: 600px) {
-            :root {
-                --slide-padding: clamp(1rem, 3vw, 2rem);
-                --content-gap: clamp(0.5rem, 1.5vw, 1rem);
-            }
-        }
-
-        @media (max-width: 768px) {
-            :root {
-                --title-size: clamp(1.5rem, 8vw, 3rem);
-            }
-        }
-
-        @media (max-height: 500px) and (orientation: landscape) {
-            /* Extra compact for landscape phones */
-            :root {
-                --title-size: clamp(1.25rem, 5vw, 2rem);
-                --slide-padding: clamp(0.75rem, 2vw, 1.5rem);
-            }
-        }
-
-        /* ===========================================
-           ANIMATIONS
-           Trigger via .visible class (added by JS on scroll)
-           =========================================== */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity var(--duration-normal) var(--ease-out-expo),
-                        transform var(--duration-normal) var(--ease-out-expo);
-        }
-
-        .slide.visible .reveal {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Stagger children */
-        .reveal:nth-child(1) { transition-delay: 0.1s; }
-        .reveal:nth-child(2) { transition-delay: 0.2s; }
-        .reveal:nth-child(3) { transition-delay: 0.3s; }
-        .reveal:nth-child(4) { transition-delay: 0.4s; }
-
-        /* ... more styles ... */
-    </style>
-</head>
-<body>
-    <!-- Progress bar (optional) -->
-    <div class="progress-bar"></div>
-
-    <!-- Navigation dots (optional) -->
-    <nav class="nav-dots">
-        <!-- Generated by JS -->
-    </nav>
-
-    <!-- Slides -->
-    <section class="slide title-slide">
-        <h1 class="reveal">Presentation Title</h1>
-        <p class="reveal">Subtitle or author</p>
-    </section>
-
-    <section class="slide">
-        <h2 class="reveal">Slide Title</h2>
-        <p class="reveal">Content...</p>
-    </section>
-
-    <!-- More slides... -->
-
-    <script>
-        /* ===========================================
-           SLIDE PRESENTATION CONTROLLER
-           Handles navigation, animations, and interactions
-           =========================================== */
-
-        class SlidePresentation {
-            constructor() {
-                // ... initialization
-            }
-
-            // ... methods
-        }
-
-        // Initialize
-        new SlidePresentation();
-    </script>
-</body>
-</html>
-```
+- **→ `reference/html-template.md`** — Complete HTML structure, CSS patterns, typography, slide types
+- **→ `reference/viewport-fitting.md`** — Mandatory viewport CSS and responsive breakpoints
+- **→ `scripts/slide-controller.js`** — JavaScript controller for navigation and animations
 
 ### Required JavaScript Features
 
@@ -697,43 +315,16 @@ Every section should have clear comments explaining:
 - Why it exists
 - How to modify it
 
-```javascript
-/* ===========================================
-   CUSTOM CURSOR
-   Creates a stylized cursor that follows mouse with a trail effect.
-   - Uses lerp (linear interpolation) for smooth movement
-   - Grows larger when hovering over interactive elements
-   =========================================== */
-class CustomCursor {
-    constructor() {
-        // ...
-    }
-}
-```
-
 **Accessibility:**
 - Semantic HTML (`<section>`, `<nav>`, `<main>`)
 - Keyboard navigation works
 - ARIA labels where needed
 - Reduced motion support
 
-```css
-@media (prefers-reduced-motion: reduce) {
-    .reveal {
-        transition: opacity 0.3s ease;
-        transform: none;
-    }
-}
-```
-
-**Responsive & Viewport Fitting (CRITICAL):**
-
-**See the "CRITICAL: Viewport Fitting Requirements" section above for complete CSS and guidelines.**
-
-Quick reference:
+**Responsive & Viewport Fitting:**
 - Every `.slide` must have `height: 100vh; height: 100dvh; overflow: hidden;`
 - All typography and spacing must use `clamp()`
-- Respect content density limits (max 4-6 bullets, max 6 cards, etc.)
+- Respect content density limits
 - Include breakpoints for heights: 700px, 600px, 500px
 - When content doesn't fit → split into multiple slides, never scroll
 
@@ -745,73 +336,18 @@ When converting PowerPoint files:
 
 ### Step 4.1: Extract Content
 
-Use Python with `python-pptx` to extract:
+Use the extraction script to pull content from PowerPoint files:
 
-```python
-from pptx import Presentation
-from pptx.util import Inches, Pt
-import json
-import os
-import base64
+**→ Run `scripts/pptx-extract.py` with the PPTX file path**
 
-def extract_pptx(file_path, output_dir):
-    """
-    Extract all content from a PowerPoint file.
-    Returns a JSON structure with slides, text, and images.
-    """
-    prs = Presentation(file_path)
-    slides_data = []
-
-    # Create assets directory
-    assets_dir = os.path.join(output_dir, 'assets')
-    os.makedirs(assets_dir, exist_ok=True)
-
-    for slide_num, slide in enumerate(prs.slides):
-        slide_data = {
-            'number': slide_num + 1,
-            'title': '',
-            'content': [],
-            'images': [],
-            'notes': ''
-        }
-
-        for shape in slide.shapes:
-            # Extract title
-            if shape.has_text_frame:
-                if shape == slide.shapes.title:
-                    slide_data['title'] = shape.text
-                else:
-                    slide_data['content'].append({
-                        'type': 'text',
-                        'content': shape.text
-                    })
-
-            # Extract images
-            if shape.shape_type == 13:  # Picture
-                image = shape.image
-                image_bytes = image.blob
-                image_ext = image.ext
-                image_name = f"slide{slide_num + 1}_img{len(slide_data['images']) + 1}.{image_ext}"
-                image_path = os.path.join(assets_dir, image_name)
-
-                with open(image_path, 'wb') as f:
-                    f.write(image_bytes)
-
-                slide_data['images'].append({
-                    'path': f"assets/{image_name}",
-                    'width': shape.width,
-                    'height': shape.height
-                })
-
-        # Extract notes
-        if slide.has_notes_slide:
-            notes_frame = slide.notes_slide.notes_text_frame
-            slide_data['notes'] = notes_frame.text
-
-        slides_data.append(slide_data)
-
-    return slides_data
+```bash
+python scripts/pptx-extract.py presentation.pptx ./extracted
 ```
+
+The script extracts:
+- Slide titles and content
+- Images (saved to assets folder)
+- Speaker notes
 
 ### Step 4.2: Confirm Content Structure
 
@@ -884,153 +420,20 @@ Would you like me to make any adjustments?
 
 ---
 
-## Style Reference: Effect → Feeling Mapping
+## Animation Reference
 
-Use this guide to match animations to intended feelings:
+Different styles call for different animation approaches:
 
-### Dramatic / Cinematic
-- Slow fade-ins (1-1.5s)
-- Large scale transitions (0.9 → 1)
-- Dark backgrounds with spotlight effects
-- Parallax scrolling
-- Full-bleed images
+| Style | Characteristics |
+|-------|-----------------|
+| **Dramatic/Cinematic** | Slow fades (1-1.5s), scale transitions, parallax, spotlight effects |
+| **Techy/Futuristic** | Neon glows, particle systems, grid patterns, glitch effects |
+| **Playful/Friendly** | Bouncy easing, rounded corners, floating animations |
+| **Professional/Corporate** | Fast subtle animations (200-300ms), minimal decoration |
+| **Calm/Minimal** | Slow subtle motion, high whitespace, content-focused |
+| **Editorial/Magazine** | Strong typography hierarchy, pull quotes, grid-breaking layouts |
 
-### Techy / Futuristic
-- Neon glow effects (box-shadow with accent color)
-- Particle systems (canvas background)
-- Grid patterns
-- Monospace fonts for accents
-- Glitch or scramble text effects
-- Cyan, magenta, electric blue palette
-
-### Playful / Friendly
-- Bouncy easing (spring physics)
-- Rounded corners (large radius)
-- Pastel or bright colors
-- Floating/bobbing animations
-- Hand-drawn or illustrated elements
-
-### Professional / Corporate
-- Subtle, fast animations (200-300ms)
-- Clean sans-serif fonts
-- Navy, slate, or charcoal backgrounds
-- Precise spacing and alignment
-- Minimal decorative elements
-- Data visualization focus
-
-### Calm / Minimal
-- Very slow, subtle motion
-- High whitespace
-- Muted color palette
-- Serif typography
-- Generous padding
-- Content-focused, no distractions
-
-### Editorial / Magazine
-- Strong typography hierarchy
-- Pull quotes and callouts
-- Image-text interplay
-- Grid-breaking layouts
-- Serif headlines, sans-serif body
-- Black and white with one accent
-
----
-
-## Animation Patterns Reference
-
-### Entrance Animations
-
-```css
-/* Fade + Slide Up (most common) */
-.reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s var(--ease-out-expo),
-                transform 0.6s var(--ease-out-expo);
-}
-
-.visible .reveal {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Scale In */
-.reveal-scale {
-    opacity: 0;
-    transform: scale(0.9);
-    transition: opacity 0.6s, transform 0.6s var(--ease-out-expo);
-}
-
-/* Slide from Left */
-.reveal-left {
-    opacity: 0;
-    transform: translateX(-50px);
-    transition: opacity 0.6s, transform 0.6s var(--ease-out-expo);
-}
-
-/* Blur In */
-.reveal-blur {
-    opacity: 0;
-    filter: blur(10px);
-    transition: opacity 0.8s, filter 0.8s var(--ease-out-expo);
-}
-```
-
-### Background Effects
-
-```css
-/* Gradient Mesh */
-.gradient-bg {
-    background:
-        radial-gradient(ellipse at 20% 80%, rgba(120, 0, 255, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(0, 255, 200, 0.2) 0%, transparent 50%),
-        var(--bg-primary);
-}
-
-/* Noise Texture */
-.noise-bg {
-    background-image: url("data:image/svg+xml,..."); /* Inline SVG noise */
-}
-
-/* Grid Pattern */
-.grid-bg {
-    background-image:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
-}
-```
-
-### Interactive Effects
-
-```javascript
-/* 3D Tilt on Hover */
-class TiltEffect {
-    constructor(element) {
-        this.element = element;
-        this.element.style.transformStyle = 'preserve-3d';
-        this.element.style.perspective = '1000px';
-        this.bindEvents();
-    }
-
-    bindEvents() {
-        this.element.addEventListener('mousemove', (e) => {
-            const rect = this.element.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width - 0.5;
-            const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-            this.element.style.transform = `
-                rotateY(${x * 10}deg)
-                rotateX(${-y * 10}deg)
-            `;
-        });
-
-        this.element.addEventListener('mouseleave', () => {
-            this.element.style.transform = 'rotateY(0) rotateX(0)';
-        });
-    }
-}
-```
+**→ For complete animation patterns and code, read `reference/animation-patterns.md`**
 
 ---
 
@@ -1060,6 +463,9 @@ class TiltEffect {
 - Prefer `transform` and `opacity` animations
 - Throttle scroll/mousemove handlers
 
+**Content overflowing slides:**
+- See `reference/viewport-fitting.md` for complete troubleshooting
+
 ---
 
 ## Related Skills
@@ -1067,6 +473,19 @@ class TiltEffect {
 - **learn** — Generate FORZARA.md documentation for the presentation
 - **frontend-design** — For more complex interactive pages beyond slides
 - **design-and-refine:design-lab** — For iterating on component designs
+
+---
+
+## Reference Files
+
+| File | Purpose |
+|------|---------|
+| `reference/viewport-fitting.md` | Mandatory viewport CSS, responsive breakpoints, overflow prevention |
+| `reference/html-template.md` | Complete HTML structure, CSS patterns, typography, accessibility |
+| `reference/animation-patterns.md` | Entrance animations, background effects, interactive effects |
+| `scripts/slide-controller.js` | JavaScript controller for navigation, animations, interactions |
+| `scripts/pptx-extract.py` | Python script for extracting content from PowerPoint files |
+| `reference/style-presets.md` | Curated visual styles with colors, fonts, signature elements |
 
 ---
 
