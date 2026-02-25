@@ -452,6 +452,59 @@ Before finalizing any presentation, verify:
 
 ---
 
+### 13. Deep Ocean Tech
+
+**Vibe:** Professional, tech-forward, strategic, corporate innovation
+
+**Layout:** Top title bar layout. Header bar (12.5vh height, min 80px) with horizontal deep blue gradient containing title. Content area (87.5vh) below on white/light gray background. **Mobile (<768px): Header height reduced to 15vh, content 85vh.**
+
+**Typography:**
+- Display: `MiSans` (700/800)
+- Body: `MiSans` (400/500)
+- Labels: `Inter` (600, small caps)
+
+**Colors:**
+```css
+:root {
+    /* Header - Deep Ocean Blue */
+    --header-height: 12.5vh;
+    --header-min-height: 80px;
+    --header-gradient: linear-gradient(90deg, #17406D 0%, #0F6FC6 60%, #DBEFF9 100%);
+    --content-height: 87.5vh;
+
+    /* Accent - Coral/Orange */
+    --accent-coral: #FF6B6B;
+    --accent-orange: #F49100;
+    --accent-blue: #0F6FC6;
+
+    /* Content Area */
+    --content-bg: #F8FAFC;
+    --content-card: #FFFFFF;
+
+    /* Text */
+    --text-primary: #1A1A1A;
+    --text-secondary: #4A4A4A;
+    --text-on-dark: #F8FAFC;
+
+    /* Labels */
+    --label-coral-bg: rgba(255, 107, 107, 0.12);
+    --label-coral-border: rgba(255, 107, 107, 0.24);
+}
+```
+
+**Signature Elements:**
+- Top title bar (12.5vh height) with horizontal deep blue gradient (left to right)
+- Coral pill labels for section tags (semi-transparent with border)
+- Dual accent system: Blue (#0F6FC6) for links/navigation, Coral (#FF6B6B) for highlights/CTAs
+- White content cards with subtle shadow
+- Thin accent lines below section titles
+- Icon + text metadata rows at bottom
+- Custom bullet markers in accent colors
+
+**Best For:** Corporate presentations, tech company decks, investor pitches, product roadmaps, strategic analysis reports
+
+---
+
 ## Font Pairing Quick Reference
 
 | Preset | Display Font | Body Font | Source |
@@ -466,6 +519,7 @@ Before finalizing any presentation, verify:
 | Vintage Editorial | Fraunces | Work Sans | Google |
 | Neon Cyber | Clash Display | Satoshi | Fontshare |
 | Terminal Green | JetBrains Mono | JetBrains Mono | JetBrains |
+| Deep Ocean Tech | MiSans | MiSans | Custom |
 
 ---
 

@@ -135,6 +135,7 @@ Users can select a style in **two ways**:
 | Terminal Green | Developer-focused | Dev tools, APIs |
 | Swiss Modern | Minimal, precise | Corporate, data |
 | Paper & Ink | Literary, thoughtful | Storytelling |
+| Deep Ocean Tech | Confident, tech-forward | Corporate presentations |
 
 ### Step 2.0: Style Path Selection
 

@@ -135,6 +135,7 @@ Available presets can be specified by name — skip the style discovery phase en
 | **Vintage Editorial** | Witty, personality-driven | Personal brands |
 | **Swiss Modern** | Minimal, precise | Corporate, data |
 | **Paper & Ink** | Literary, thoughtful | Storytelling |
+| **Deep Ocean Tech** | Professional, tech-forward | Corporate decks, investor pitches |
 
 ## Output Format
 
